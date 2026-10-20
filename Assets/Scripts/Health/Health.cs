@@ -18,6 +18,11 @@ public class Health : MonoBehaviour
     public AudioClip deathSound;
 
     private DeathManager deathComponent;
+
+    private void Awake()
+    {
+        audioSource = GetComponent<AudioSource>();
+    }
     private void Start()
     {
         if (useDeathComponent)

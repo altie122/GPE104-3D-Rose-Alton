@@ -1,0 +1,11 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/EndScreen.uss?fileID=7433441132597879392&amp;guid=25ec4094354bfc0448b109a266f44aa4&amp;type=3#EndScreen"/>
+    <ui:VisualElement class="main container" style="flex-grow: 0; flex-shrink: 0;">
+        <ui:Label text="Label" name="Title" class="title"/>
+        <ui:Label text="Label" name="Subtitle" class="title-2"/>
+        <ui:VisualElement class="buttonContainer" style="flex-grow: 0; flex-shrink: 0;">
+            <ui:Button text="Restart" name="RestartBtn" class="button"/>
+            <ui:Button text="Exit Game" name="ExitBtn" class="button"/>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

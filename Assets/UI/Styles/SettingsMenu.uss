@@ -1,0 +1,5 @@
+@import url("project://database/Assets/UI/Styles/Shared.uss?fileID=7433441132597879392&guid=2acf208de62cfb64b9252e199a10a9af&type=3#Shared");
+
+.main {
+    width: 45%;
+}

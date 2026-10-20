@@ -13,6 +13,7 @@ public class PlayerLivesHandler : MonoBehaviour
             {
                 // Debug.Log("Player Lives Handler: - 1 life");
                 healthComponent.currentHealth = healthComponent.maxHealth;
+                transform.position = new Vector3(0, 75, 0);
                 LevelData.instance.playerLives--;
             }
 

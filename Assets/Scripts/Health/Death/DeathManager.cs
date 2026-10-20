@@ -13,11 +13,7 @@ public class DeathManager : MonoBehaviour
         obstacleToRemoveOnDeath = GetComponent<Obstacle>();
         deathHandler = GetComponent<Death>();
     }
-
-    public void Update()
-    {
-    }
-
+    
     public void Die()
     {
         if (GameManager.instance)

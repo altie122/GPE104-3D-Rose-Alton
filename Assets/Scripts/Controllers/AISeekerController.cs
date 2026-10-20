@@ -1,11 +1,11 @@
-using System;
 using UnityEngine;
 
 public class AISeekerController : AIController
 {
+    private AIPawn controlledPawn;
     private void Start()
     {
-        controlledPawn = GetComponent<Pawn>();
+        controlledPawn = GetComponent<AIPawn>();
         target = GameManager.instance.playerGameObject;
     }
 
@@ -13,11 +13,7 @@ public class AISeekerController : AIController
     {
         if (target)
         {
-            Vector3 targetPosition = target.transform.position;
-            Vector3 start = controlledPawn.transform.position;
-            Vector3 vectorToTarget = targetPosition - start;
-            
-            controlledPawn.Move(vectorToTarget);
+            controlledPawn.Seek(target.transform);
         }
         else
         {

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/MainMenu.uss"/>
+    <ui:VisualElement name="Main" class="main">
+        <ui:Label text="Main Menu" name="Title" class="title"/>
+        <ui:Button text="Start" name="StartBtn" class="button"/>
+        <ui:Button text="Settings" name="SettingsBtn" class="button"/>
+        <ui:Button text="Credits" name="CreditsBtn" class="button"/>
+        <ui:Button text="Exit" name="ExitBtn" class="button"/>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,4 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/Credits.uss?fileID=7433441132597879392&amp;guid=2857cb618b96431bb1dde1e97bda72f2&amp;type=3#Credits"/>
+    <ui:Label text="Press any button to start" name="Title" view-data-key="" class="title"/>
+</ui:UXML>

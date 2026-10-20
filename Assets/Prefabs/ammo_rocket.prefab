@@ -90,9 +90,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bullet
   fireForce: 25
-  lifetime: 10
-  shootSfx: {fileID: 0}
-  shootMixerGroup: {fileID: 0}
+  lifetime: 3
+  shootSfx: {fileID: 8300000, guid: 2045fa89914c17c4f9c68a3523267ea6, type: 3}
+  shootMixerGroup: {fileID: -7207258340552460665, guid: 75ccf7121cf75f54eb6712c24b6ecdf8, type: 2}
 --- !u!114 &2845312237307244593
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108,6 +108,7 @@ MonoBehaviour:
   damageAmount: 25
   isInstaKill: 0
   team: bullet-friendly
+  destroyOnHit: 0
 --- !u!54 &-6368702061426083880
 Rigidbody:
   m_ObjectHideFlags: 0

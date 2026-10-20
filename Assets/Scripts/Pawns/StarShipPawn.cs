@@ -2,15 +2,9 @@ using UnityEngine;
 
 public class StarShipPawn : Pawn
 {
-    
-    // Min and max teleport values
-    private float minX;
-    private float maxX;
-    private float minY;
-    private float maxY;
-    
     // Movement speeds
     public float moveForce = 5f;
+    public float turboMoveForce = 10f;
     public float rotateSpeed = 360f;
     
     // Shooting
@@ -23,10 +17,6 @@ public class StarShipPawn : Pawn
     {
         shooter = GetComponent<Shooter>();
         rb = GetComponent<Rigidbody>();
-        minX = GameManager.instance.worldBoundaryMinX;
-        maxX = GameManager.instance.worldBoundaryMaxX;
-        minY = GameManager.instance.worldBoundaryMinY;
-        maxY = GameManager.instance.worldBoundaryMaxY;
         GameManager.instance.playerGameObject = gameObject;
     }
 
@@ -36,11 +26,20 @@ public class StarShipPawn : Pawn
         {
             GameManager.instance.playerGameObject = gameObject;
         }
+
+        if (LevelData.instance)
+        {
+            if (transform.position.y > LevelData.instance.worldBoundaryY)
+            {
+                transform.position = new Vector3(transform.position.x, LevelData.instance.worldBoundaryY, transform.position.z);
+            }
+        }
     }
 
-    public override void Move(Vector3 moveVector)
+    public override void Move(Vector3 moveVector, bool useTurbo = false)
     {
-        Vector3 pushForce = moveVector * moveForce;
+        float forceToBeApplied = useTurbo ? turboMoveForce : moveForce;
+        Vector3 pushForce = moveVector * forceToBeApplied;
         rb.AddForce(pushForce);
     }
 
@@ -57,6 +56,11 @@ public class StarShipPawn : Pawn
     public override void Roll(float amount)
     {
         transform.Rotate(0, 0, amount * rotateSpeed * Time.deltaTime);
+    }
+
+    public override void RotateTowards(Vector3 lookAtPoint)
+    {
+        throw new System.NotImplementedException();
     }
 
     public override void Shoot()

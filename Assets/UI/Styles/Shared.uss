@@ -1,0 +1,48 @@
+:root {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.main {
+    padding: 12px;
+    background-color: #696970;
+}
+
+.button {
+    background-color: rgb(0, 0, 0);
+    color: aliceblue;
+    border-width: 1px;
+    border-radius: 15px;
+    border-color: aliceblue;
+    font-size: 10px;
+    align-items: auto;
+    justify-content: flex-start;
+    margin-top: 20px;
+}
+
+.button:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.button:focus {
+    background-color: rgba(0, 0, 0, 0.5);
+
+}
+
+.title, .title-1 {
+    -unity-text-auto-size: best-fit 5px 100px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: aliceblue;
+}
+
+.title-2 {
+    -unity-text-auto-size: best-fit 5px 50px;
+    -unity-font-style: bold;
+    -unity-text-align: middle-center;
+    color: aliceblue;
+}
+
+.link {
+    cursor: link;
+}

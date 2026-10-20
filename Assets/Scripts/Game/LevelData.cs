@@ -7,6 +7,8 @@ public class LevelData : MonoBehaviour
 
     public bool isPlayerAlive = true;
     public int playerLives = 3;
+
+    public float worldBoundaryY;
     
     private void Awake()
     {

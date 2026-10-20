@@ -1,0 +1,14 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/Styles/Credits.uss?fileID=7433441132597879392&amp;guid=2857cb618b96431bb1dde1e97bda72f2&amp;type=3#Credits"/>
+    <ui:VisualElement name="Main" class="main">
+        <ui:Label text="Credits" name="Title" view-data-key="" class="title"/>
+        <ui:VisualElement class="name-container" style="flex-grow: 1;">
+            <ui:Label text="Alton &quot;altie&quot; Rose - Programmer" class="name altie"/>
+            <ui:Label text="Game and audio assets obtained from &lt;a href=&quot;https://kenney.nl&quot; class=&quot;link&quot;&gt;&lt;u&gt;Kenney.nl&lt;/u&gt;&lt;/a&gt;" class="name"/>
+            <ui:Label text="Skybox obtained from &lt;a href=&quot;https://www.fab.com/listings/8e959fe9-7619-4a66-9a06-c800ed1d82e6&quot; class=&quot;link&quot;&gt;&lt;u&gt;Magic Cloud on the Fab store&lt;/u&gt;&lt;/a&gt;" class="name"/>
+            <ui:VisualElement style="flex-grow: 1;">
+                <ui:Button text="Back to main menu" name="MainMenuBtn" class="button"/>
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

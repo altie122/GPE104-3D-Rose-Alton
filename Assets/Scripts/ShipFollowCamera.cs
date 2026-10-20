@@ -1,66 +1,85 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(100)]
 public class ShipFollowCamera : MonoBehaviour
 {
     [Header("Target")]
     public Transform ship;
 
     [Header("Camera Offset")]
-    public Vector3 offsetDirection = new Vector3(0f, 1f, -1f);
+    [Tooltip("Direction from the ship, in its local coordinate system.")]
+    public Vector3 offsetDirection = new Vector3(0f, 0.25f, -1f);
 
-    [Min(0.1f)] 
-    public float distance = 20f;
-    [Min(0.1f)] 
-    public float minDistance = 5f;
-    [Min(0.1f)] 
+    [Min(0.1f)]
+    public float distance = 10f;
+
+    [Min(0.1f)]
+    public float minDistance = 3f;
+
+    [Min(0.1f)]
     public float maxDistance = 40f;
 
     [Header("Zoom")]
-    [Min(0f)] 
+    [Min(0f)]
     public float zoomSpeed = 10f;
 
+    [Min(0f)]
+    public float zoomSmoothTime = 0.08f;
+
     [Header("Following")]
-    [Min(0.01f)]
-    public float followSmoothTime = 0.2f;
+    [Tooltip(
+        "Rotation smoothing only. Position follows immediately. " +
+        "Set to 0 to stay directly behind the ship."
+    )]
+    [Min(0f)]
+    public float followSmoothTime = 0.08f;
 
     [Header("Look At")]
-    public Vector3 lookAtOffset = new Vector3(0f, 0f, 10f);
-    
+    [Tooltip(
+        "Aim offset in the smoothed ship coordinate system. " +
+        "Use zero to keep the ship centered."
+    )]
+    public Vector3 lookAtOffset = Vector3.zero;
+
     private InputSystem_Actions inputSystem;
-    private Vector3 followVelocity;
+
+    private Transform currentShip;
+    private Quaternion followRotation;
+
+    private float currentDistance;
+    private float zoomVelocity;
+
+    private bool initialized;
 
     private void Awake()
     {
         inputSystem = new InputSystem_Actions();
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        ValidateSettings();
     }
 
     private void OnEnable()
     {
         inputSystem.Player.Enable();
-        followVelocity = Vector3.zero;
+
+        initialized = false;
+        zoomVelocity = 0f;
     }
 
     private void OnDisable()
     {
         inputSystem.Player.Disable();
+        initialized = false;
     }
 
     private void OnDestroy()
     {
-        inputSystem.Dispose();
+        inputSystem?.Dispose();
     }
 
     private void Start()
     {
-        if (ship == null)
-        {
-            return;
-        }
-
-        transform.position = GetDesiredPosition();
-        UpdateLookAt();
+        SnapToTarget();
     }
 
     private void Update()
@@ -77,62 +96,166 @@ public class ShipFollowCamera : MonoBehaviour
             zoomInput += 1f;
         }
 
-        distance += zoomInput * zoomSpeed * Time.deltaTime;
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
+        distance = Mathf.Clamp(
+            distance + zoomInput * zoomSpeed * Time.deltaTime,
+            minDistance,
+            maxDistance
+        );
     }
 
     private void LateUpdate()
     {
-        if (!ship || Time.deltaTime <= 0f)
+        if (ship == null)
+        {
+            initialized = false;
+            return;
+        }
+
+        if (!initialized || currentShip != ship)
+        {
+            SnapToTarget();
+            return;
+        }
+
+        float deltaTime = Time.deltaTime;
+
+        if (deltaTime <= 0f)
         {
             return;
         }
 
-        transform.position = Vector3.SmoothDamp(
-            transform.position,
-            GetDesiredPosition(),
-            ref followVelocity,
-            followSmoothTime
+        // Smooth the reference rotation, not the world position.
+        if (followSmoothTime <= 0f)
+        {
+            followRotation = ship.rotation;
+        }
+        else
+        {
+            float blend = 1f - Mathf.Exp(
+                -deltaTime / followSmoothTime
+            );
+
+            followRotation = Quaternion.Slerp(
+                followRotation,
+                ship.rotation,
+                blend
+            );
+        }
+
+        if (zoomSmoothTime <= 0f)
+        {
+            currentDistance = distance;
+            zoomVelocity = 0f;
+        }
+        else
+        {
+            currentDistance = Mathf.SmoothDamp(
+                currentDistance,
+                distance,
+                ref zoomVelocity,
+                zoomSmoothTime,
+                Mathf.Infinity,
+                deltaTime
+            );
+        }
+
+        currentDistance = Mathf.Clamp(
+            currentDistance,
+            minDistance,
+            maxDistance
         );
 
-        UpdateLookAt();
+        ApplyCameraPose();
     }
 
-    private Vector3 GetDesiredPosition()
+    public void SnapToTarget()
+    {
+        if (ship == null)
+        {
+            initialized = false;
+            return;
+        }
+
+        ValidateSettings();
+
+        currentShip = ship;
+        followRotation = ship.rotation;
+
+        currentDistance = distance;
+        zoomVelocity = 0f;
+
+        initialized = true;
+
+        ApplyCameraPose();
+    }
+
+    private void ApplyCameraPose()
     {
         Vector3 localDirection =
             offsetDirection.sqrMagnitude > 0.0001f
                 ? offsetDirection.normalized
                 : Vector3.back;
 
-        Vector3 worldDirection = ship.TransformDirection(localDirection);
+        // Anchor directly to the ship so movement cannot create lag.
+        Vector3 cameraPosition =
+            ship.position +
+            followRotation * localDirection * currentDistance;
 
-        return ship.position + worldDirection * distance;
-    }
-
-    private void UpdateLookAt()
-    {
+        // Use the same rotation frame for placement and aiming.
         Vector3 lookAtPoint =
-            ship.position + ship.rotation * lookAtOffset;
+            ship.position + followRotation * lookAtOffset;
 
-        Vector3 lookDirection = lookAtPoint - transform.position;
+        Vector3 lookDirection = lookAtPoint - cameraPosition;
 
-        if (lookDirection.sqrMagnitude > 0.0001f)
+        if (lookDirection.sqrMagnitude <= 0.0001f)
         {
-            transform.rotation = Quaternion.LookRotation(
-                lookDirection,
-                Vector3.up
-            );
+            lookDirection = followRotation * Vector3.forward;
         }
+        else
+        {
+            lookDirection.Normalize();
+        }
+
+        Vector3 cameraUp = followRotation * Vector3.up;
+
+        // Avoid an unstable look rotation if forward and up align.
+        if (
+            Vector3.Cross(lookDirection, cameraUp).sqrMagnitude
+            < 0.0001f
+        )
+        {
+            cameraUp = followRotation * Vector3.forward;
+        }
+
+        Quaternion cameraRotation = Quaternion.LookRotation(
+            lookDirection,
+            cameraUp
+        );
+
+        transform.SetPositionAndRotation(
+            cameraPosition,
+            cameraRotation
+        );
     }
 
     private void OnValidate()
     {
+        ValidateSettings();
+    }
+
+    private void ValidateSettings()
+    {
         minDistance = Mathf.Max(0.1f, minDistance);
         maxDistance = Mathf.Max(minDistance, maxDistance);
-        distance = Mathf.Clamp(distance, minDistance, maxDistance);
+
+        distance = Mathf.Clamp(
+            distance,
+            minDistance,
+            maxDistance
+        );
 
         zoomSpeed = Mathf.Max(0f, zoomSpeed);
-        followSmoothTime = Mathf.Max(0.01f, followSmoothTime);
+        zoomSmoothTime = Mathf.Max(0f, zoomSmoothTime);
+        followSmoothTime = Mathf.Max(0f, followSmoothTime);
     }
 }

@@ -27,11 +27,11 @@ public class PlayerController : Controller
         
         if (inputSystem.Player.MoveForward.IsPressed())
         {
-            controlledPawn.Move(controlledPawn.transform.forward);
+            controlledPawn.Move(controlledPawn.transform.forward, inputSystem.Player.Turbo.IsPressed());
         }
         if (inputSystem.Player.MoveBackward.IsPressed())
         {
-            controlledPawn.Move(-controlledPawn.transform.forward);
+            controlledPawn.Move(-controlledPawn.transform.forward, inputSystem.Player.Turbo.IsPressed());
         }
 
         if (rotateClockwiseAction.IsPressed())
@@ -71,7 +71,12 @@ public class PlayerController : Controller
 
         if (inputSystem.Player.Up.IsPressed())
         {
-            controlledPawn.Move(controlledPawn.transform.up);
+            controlledPawn.Move(controlledPawn.transform.up, inputSystem.Player.Turbo.IsPressed());
+        }
+        
+        if (inputSystem.Player.Down.IsPressed())
+        {
+            controlledPawn.Move(-controlledPawn.transform.up, inputSystem.Player.Turbo.IsPressed());
         }
     }
     

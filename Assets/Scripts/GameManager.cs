@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
@@ -28,26 +29,10 @@ public class GameManager : MonoBehaviour
     public TMP_Text scoreText;
     
     [Header("Lives")]
-    public int playerLiveCount;
-    public int defaultPlayerLiveCount;
     public TMP_Text livesText;
     
     [Header("Audio")]
     public AudioMixer audioMixer;
-
-    [Header("World boundaries")]
-    public float worldBoundaryMinX;
-    public float worldBoundaryMaxX;
-    public float worldBoundaryMinY;
-    public float worldBoundaryMaxY;
-
-    [Header("Enemies")]
-    public List<GameObject> asteroidPrefabs;
-    public List<GameObject> ufoPrefabs;
-    [Min(1)]
-    public int initialEnemyCount;
-    [Range(0, 1)]
-    public float chanceOfUfo;
 
     private void Awake()
     {
@@ -69,47 +54,48 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        // // Check if the game is over
-        // if (isGameOver)
-        // {
-        //     // If the game is over, check if the game should be restarted
-        //     if (playerController && playerController.controlledPawn && obstacleList.Count > 0)
-        //     {
-        //         // If the game is ready to be started, unpause and restart game
-        //         isPaused = false;
-        //         isPauseMenuEnabled = true;
-        //         isGameOver = false;
-        //         Time.timeScale = 1f;
-        //     }
-        //     // If the game is over, return early
-        //     return;
-        // }
-        // // If the game is not over, continue normal checks and processes
-        // else
-        // {
-        //     // If all obstacles are destroyed and the player's pawn still exists, the game has been won
-        //     if (obstacleList != null && playerController && obstacleList.Count <= 0 && playerController.controlledPawn)
-        //     {
-        //         WinGame();
-        //     }
-        //     // If the player pawn is destroyed, the game has been lost
-        //     else if (playerController && !playerController.controlledPawn)
-        //     {
-        //         LoseGame();
-        //     }
-        //
-        //     // Update score text
-        //     if (scoreText)
-        //     {
-        //         scoreText.text = "Score: " + score;
-        //     }
-        //     
-        //     // Update lives text
-        //     if (livesText)
-        //     {
-        //         livesText.text = "Lives: " + playerLiveCount;
-        //     }
-        // }
+        // Check if the game is over
+        if (isGameOver)
+        {
+            // If the game is over, check if the game should be restarted
+            if (playerController && playerController.controlledPawn)
+            {
+                // If the game is ready to be started, unpause and restart game
+                isPaused = false;
+                isPauseMenuEnabled = true;
+                isGameOver = false;
+                Time.timeScale = 1f;
+            }
+            // If the game is over, return early
+            return;
+        }
+        // If the game is not over, continue normal checks and processes
+        else
+        {
+            if (playerController && !playerController.controlledPawn && !LevelData.instance.isPlayerAlive)
+            {
+                LoseGame();
+            }
+        
+            // Update score text
+            if (scoreText)
+            {
+                scoreText.text = "Score: " + score;
+            }
+            
+            // Update lives text
+            if (livesText)
+            {
+                if (LevelData.instance)
+                {
+                    livesText.text = "Lives: " + LevelData.instance.playerLives;
+                }
+                else
+                {
+                    livesText.text = "Waiting on lives count";
+                }
+            }
+        }
     }
 
     // Reset game
@@ -123,28 +109,11 @@ public class GameManager : MonoBehaviour
         playerController = null;
         endScreen = null;
         
-        playerLiveCount = defaultPlayerLiveCount;
-        
         playerGameObject = null;
         
         obstacleList.Clear();
         
-        // Create enemies based on number supplied in `initialEnemyCount`
-        for (int index = 0; index < initialEnemyCount; index++)
-        {
-            // Generate random number 0-1 (represents 0% - 100%)
-            float randomNumber = Random.Range(0f, 1f);
-            // If the random number is smaller than the chance of an ufo spawning, spawn a UFO
-            if (randomNumber <= chanceOfUfo)
-            {
-                Instantiate(ufoPrefabs[Random.Range(0, ufoPrefabs.Count)], new Vector3(Random.Range(worldBoundaryMinX, worldBoundaryMaxX), Random.Range(worldBoundaryMinY, worldBoundaryMaxY), 0f), Quaternion.identity);
-            }
-            // If the random number is grater than the chance of an ufo spawning, spawn an asteroid
-            else
-            {
-                Instantiate(asteroidPrefabs[Random.Range(0, asteroidPrefabs.Count)], new Vector3(Random.Range(worldBoundaryMinX, worldBoundaryMaxX), Random.Range(worldBoundaryMinY, worldBoundaryMaxY), 0f), Quaternion.identity);
-            }
-        }
+        SceneManager.LoadScene("Main", LoadSceneMode.Single);
     }
 
     // Lose game
@@ -156,20 +125,6 @@ public class GameManager : MonoBehaviour
         { 
             endScreen.ShowEndScreen("Fail!", "");
         } 
-        isPaused = true;
-        Time.timeScale = 0f;
-        isGameOver = true;
-    }
-
-    // Win game
-    private void WinGame()
-    {
-        isPauseMenuEnabled = false;
-        Debug.Log("GameManager: You win!");
-        if (endScreen)
-        {
-            endScreen.ShowEndScreen("Victory!", "Score: "  + score);
-        }
         isPaused = true;
         Time.timeScale = 0f;
         isGameOver = true;
